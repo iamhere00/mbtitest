@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pink Dream MBTI</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:'Prompt',sans-serif;
+    background:linear-gradient(135deg,#ffd6ec,#f3d1ff,#d6e4ff);
+    background-size:300% 300%;
+    animation:bgMove 10s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+.card{
+    background:white;
+    width:95%;
+    max-width:520px;
+    padding:40px;
+    border-radius:28px;
+    box-shadow:0 25px 60px rgba(233,30,99,0.15);
+    text-align:center;
+    position:relative;
+    overflow:visible;
+}
+
+h1{
+    color:#e91e63;
+    margin-bottom:20px;
+}
+
+/* progress */
+.progress-wrapper{margin-bottom:25px}
+
+.progress-text{
+    font-size:14px;
+    color:#777;
+    margin-bottom:8px;
+}
+
+.progress-bar{
+    width:100%;
+    height:14px;
+    background:#fce4ec;
+    border-radius:20px;
+    position:relative;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#ff6ec4,#7873f5);
+    border-radius:20px;
+    transition:width .4s ease;
+}
+
+.character{
+    position:absolute;
+    top:-30px;
+    transform:translateX(-50%);
+    font-size:28px;
+    transition:left .4s ease;
+}
+
+/* bounce animation */
+.bounce{
+    animation:bounce .4s;
+}
+@keyframes bounce{
+    0%{transform:translate(-50%,0)}
+    50%{transform:translate(-50%,-12px)}
+    100%{transform:translate(-50%,0)}
+}
+
+/* question */
+.question{
+    font-size:19px;
+    color:#333;
+    margin-bottom:25px;
+}
+
+/* buttons */
+.btn{
+    position:relative;
+    overflow:hidden;
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:16px;
+    font-size:16px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.btn-primary{
+    background:linear-gradient(90deg,#ff6ec4,#ff9a9e);
+    color:white;
+}
+
+.btn-secondary{
+    background:#f3e5f5;
+    color:#e91e63;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* ripple */
+.ripple{
+    position:absolute;
+    border-radius:50%;
+    transform:scale(0);
+    animation:ripple .6s linear;
+    background:rgba(255,255,255,0.6);
+}
+@keyframes ripple{
+    to{transform:scale(4);opacity:0}
+}
+
+/* loader */
+.loader{
+    border:6px solid #fce4ec;
+    border-top:6px solid #e91e63;
+    border-radius:50%;
+    width:60px;
+    height:60px;
+    margin:25px auto;
+    animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* result */
+.result{
+    font-size:42px;
+    font-weight:bold;
+    background:linear-gradient(90deg,#ff6ec4,#7873f5);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin:20px 0;
+    animation:pop .5s ease;
+}
+@keyframes pop{
+    from{transform:scale(.6);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+/* sparkle */
+.sparkle{
+    position:absolute;
+    font-size:18px;
+    animation:floatUp 3s linear forwards;
+}
+@keyframes floatUp{
+    to{transform:translateY(-400px);opacity:0}
+}
+/* dreamy glow card */
+.card{
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(255,182,193,0.4);
+}
+
+/* floating background hearts */
+.bg-heart{
+    position:fixed;
+    font-size:22px;
+    animation:floatBg 8s linear infinite;
+    opacity:.4;
+}
+@keyframes floatBg{
+    from{transform:translateY(100vh) scale(.6);opacity:.6}
+    to{transform:translateY(-20vh) scale(1.2);opacity:0}
+}
+
+/* big love explosion */
+.big-heart{
+    position:fixed;
+    font-size:40px;
+    animation:explode 2.5s ease-out forwards;
+}
+@keyframes explode{
+    0%{transform:translate(0,0) scale(.5);opacity:1}
+    100%{transform:translate(var(--x),var(--y)) scale(1.8);opacity:0}
+}
+
+/* super cute glowing title */
+.love-title{
+    font-size:42px;
+    font-weight:bold;
+    background:linear-gradient(90deg,#ff6ec4,#ff9a9e,#ff6ec4);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite, pop 0.8s ease;
+}
+
+@keyframes shine{
+    to{background-position:200% center}
+}
+
+/* cute bounce button */
+.btn{
+    transition:.25s ease;
+}
+
+.btn:active{
+    transform:scale(.95);
+}
+
+.btn-primary{
+    box-shadow:0 8px 25px rgba(255,105,180,.4);
+}
+
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>💗 Dreamy MBTI Test 💗</h1>
+    <div id="progressSection"></div>
+    <div id="content"></div>
+</div>
+
+<script>
+const questions=[
+{question:"คุณรู้สึกมีพลังเมื่อได้อยู่กับคนจำนวนมาก",type:"EI"},
+{question:"คุณชอบวางแผนล่วงหน้ามากกว่าทำตามสถานการณ์",type:"JP"},
+{question:"คุณตัดสินใจด้วยเหตุผลมากกว่าความรู้สึก",type:"TF"},
+{question:"คุณสนใจแนวคิดเชิงนามธรรมมากกว่ารายละเอียด",type:"SN"},
+{question:"คุณชอบทำงานเป็นทีมมากกว่าทำคนเดียว",type:"EI"}
+];
+
+let currentQuestion=0;
+let answers=[];
+let scores;
+
+const content=document.getElementById("content");
+const progressSection=document.getElementById("progressSection");
+
+function ripple(btn,e){
+const circle=document.createElement("span");
+circle.classList.add("ripple");
+const rect=btn.getBoundingClientRect();
+circle.style.width=circle.style.height=Math.max(rect.width,rect.height)+"px";
+circle.style.left=e.clientX-rect.left-rect.width/2+"px";
+circle.style.top=e.clientY-rect.top-rect.height/2+"px";
+btn.appendChild(circle);
+setTimeout(()=>circle.remove(),600);
+}
+
+function showStart(){
+progressSection.innerHTML="";
+content.innerHTML=`
+<p style="color:#666;margin-bottom:20px">มาค้นหาบุคลิกของคุณกัน ✨</p>
+<button class="btn btn-primary">เริ่มทำแบบทดสอบ</button>
+`;
+document.querySelector(".btn").onclick=(e)=>{ripple(e.target,e);startTest()};
+}
+
+function startTest(){
+currentQuestion=0;
+answers=[];
+scores={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+showQuestion();
+}
+
+function updateProgress(){
+const percent=(currentQuestion/questions.length)*100;
+progressSection.innerHTML=`
+<div class="progress-wrapper">
+<div class="progress-text">ข้อที่ ${currentQuestion+1} / ${questions.length}</div>
+<div class="progress-bar">
+<div class="progress-fill" style="width:${percent}%"></div>
+<div class="character" style="left:${percent}%">🐰</div>
+</div>
+</div>
+`;
+}
+
+function showQuestion(){
+updateProgress();
+const q=questions[currentQuestion];
+content.innerHTML=`
+<div class="question">${q.question}</div>
+<button class="btn btn-primary">เห็นด้วย</button>
+<button class="btn btn-secondary">ไม่เห็นด้วย</button>
+`;
+
+const btns=document.querySelectorAll(".btn");
+btns[0].onclick=(e)=>{ripple(e.target,e);selectAnswer('A')};
+btns[1].onclick=(e)=>{ripple(e.target,e);selectAnswer('B')};
+}
+
+function selectAnswer(choice){
+answers.push(choice);
+document.querySelector(".character").classList.add("bounce");
+currentQuestion++;
+setTimeout(()=>{
+if(currentQuestion<questions.length){showQuestion();}
+else{showFinalConfirm();}
+},300);
+}
+
+function showFinalConfirm(){
+progressSection.innerHTML=`<div class="progress-text">ทำครบแล้ว 🎉</div>`;
+content.innerHTML=`
+<p style="color:#666;margin-bottom:20px">พร้อมดูผลลัพธ์หรือยัง?</p>
+<button class="btn btn-primary">ดูผลลัพธ์</button>
+`;
+document.querySelector(".btn").onclick=(e)=>{ripple(e.target,e);calculateResult()};
+}
+
+function calculateResult(){
+answers.forEach((ans,i)=>{
+const type=questions[i].type;
+if(ans==='A')scores[type[0]]++;
+else scores[type[1]]++;
+});
+content.innerHTML=`
+<p style="color:#666">กำลังวิเคราะห์...</p>
+<div class="loader"></div>
+`;
+setTimeout(showResult,2000);
+}
+
+function showResult(){
+
+progressSection.innerHTML="";
+
+content.innerHTML=`
+<div class="love-title">
+คุณกำลังมีเกณฑ์ได้มีแฟนนะ 💕
+</div>
+
+<p style="color:#ff69b4;margin:15px 0;font-size:18px">
+จักรวาลกำลังส่งพลังความรักมาให้คุณ 💖✨
+</p>
+
+<button class="btn btn-primary" onclick="loveTrap()">
+คลิกเพื่อดูคำตอบและรายละเอียด
+</button>
+`;
+
+launchBigHearts();
+}
+
+
+function loveTrap(){
+progressSection.innerHTML="";
+content.innerHTML=`
+<div class="question" style="font-size:22px;color:#e91e63">
+เป็นแฟนกันไหม? 💖
+</div>
+<button id="yesBtn" class="btn btn-primary">Yes 💗</button>
+<button id="noBtn" class="btn btn-secondary">No 😏</button>
+`;
+
+let yesSize=1;
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+
+noBtn.onclick=()=>{
+yesSize+=0.5;
+yesBtn.style.transform=`scale(${yesSize})`;
+yesBtn.style.zIndex="10";
+
+if(yesSize>3){
+yesBtn.style.position="fixed";
+yesBtn.style.top="0";
+yesBtn.style.left="0";
+yesBtn.style.width="100vw";
+yesBtn.style.height="100vh";
+yesBtn.style.borderRadius="0";
+yesBtn.style.fontSize="40px";
+}
+};
+
+yesBtn.onclick=()=>{
+content.innerHTML=`
+<div style="font-size:26px;color:#e91e63;margin-top:40px">
+หวายโดนหลอก 😜<br><br>
+ใครจะเป็นแฟนกับหมา 🐶
+</div>
+`;
+
+for(let i=0;i<40;i++){
+const sp=document.createElement("div");
+sp.classList.add("sparkle");
+sp.innerHTML="💖";
+sp.style.left=Math.random()*100+"%";
+sp.style.bottom="0px";
+document.querySelector(".card").appendChild(sp);
+setTimeout(()=>sp.remove(),3000);
+}
+};
+}
+
+function launchBigHearts(){
+for(let i=0;i<60;i++){
+const heart=document.createElement("div");
+heart.className="big-heart";
+heart.innerHTML="💖";
+
+heart.style.left="50%";
+heart.style.top="50%";
+
+const x=(Math.random()*800-400)+"px";
+const y=(Math.random()*800-400)+"px";
+
+heart.style.setProperty("--x",x);
+heart.style.setProperty("--y",y);
+
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),2500);
+}
+}
+
+function floatingBackground(){
+setInterval(()=>{
+const heart=document.createElement("div");
+heart.className="bg-heart";
+heart.innerHTML="💗";
+heart.style.left=Math.random()*100+"%";
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),8000);
+},600);
+}
+
+floatingBackground();
+
+showStart();
+</script>
+</body>
+</html>
