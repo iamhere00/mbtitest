@@ -85,6 +85,35 @@ h1{
 .love-title{font-size:clamp(28px,7vw,42px);font-weight:700;line-height:1.45;background:linear-gradient(90deg,#ff5d9f,#bf7bea,#ff8cba);background-size:200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:titleShine 4s linear infinite,resultPop .6s ease both}
 .yes-btn{transform-origin:center;transition:transform .3s ease,all .3s ease}
 .final-message{font-size:25px;color:#e85c9b;line-height:1.8;margin:20px 0;animation:resultPop .6s ease both}
+
+.no-overlay{
+ position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;
+ background:rgba(255,220,237,.78);backdrop-filter:blur(9px);
+ opacity:0;transition:opacity .25s ease;
+}
+.no-overlay.show{opacity:1}
+.no-dialog{
+ width:min(100%,440px);padding:34px 25px;border-radius:30px;text-align:center;
+ background:linear-gradient(145deg,#fff,#fff2f8);border:2px solid #ffd2e6;
+ box-shadow:0 22px 70px #d85b9650;transform:translateY(18px) scale(.94);
+ transition:transform .3s cubic-bezier(.2,1.4,.5,1);
+}
+.no-overlay.show .no-dialog{transform:translateY(0) scale(1)}
+.no-dialog-deco{font-size:32px;letter-spacing:7px;margin-bottom:15px}
+.no-message{font-size:clamp(25px,6vw,36px);font-weight:700;line-height:1.45;color:#ed5d9e}
+.no-submessage{font-size:14px;color:#ae8299;margin:14px 0 20px}
+.no-dialog .btn{margin:0}
+.last-hint{position:relative;z-index:25;color:#d95f9b;font-weight:500;margin-top:20px}
+.yes-fullscreen{
+ position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;
+ max-width:none!important;margin:0!important;border:0!important;border-radius:0!important;
+ z-index:2000!important;display:grid!important;place-items:center!important;
+ font-size:clamp(42px,12vw,90px)!important;font-weight:700!important;
+ box-shadow:none!important;animation:yesTakeover .55s cubic-bezier(.2,1.2,.4,1) both;
+}
+@keyframes yesTakeover{from{transform:scale(.25);opacity:.6}to{transform:scale(1);opacity:1}}
+.yes-only-mode .card{z-index:1}
+
 @media(max-width:480px){body{padding:18px 12px}.card{border-radius:27px;padding:27px 21px}.top-deco{font-size:23px}.btn{padding:14px 15px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 </style>
@@ -186,14 +215,80 @@ function loveTrap(){
   <button id="yesBtn" class="btn btn-primary yes-btn">Yes 💗</button>
   <button id="noBtn" class="btn btn-secondary">No 😏</button>
   <p style="font-size:12px;color:#b18da3">เลือกดี ๆ น้าาา 🌷</p>`;
- let yesSize=1;const yesBtn=document.getElementById("yesBtn"),noBtn=document.getElementById("noBtn");
+
+ const yesBtn=document.getElementById("yesBtn");
+ const noBtn=document.getElementById("noBtn");
+ const messages=[
+  "เลือก NO จริงเหรอ? 🥺",
+  "ลองคิดดูอีกทีไม่ได้เหรอ… 💗",
+  "หัวใจเรารอฟังคำว่า YES อยู่นะ",
+  "แน่ใจนะว่าจะใจร้ายกับเราอะ? 😿",
+  "กดผิดหรือเปล่า ปุ่ม YES อยู่ตรงนี้น้า",
+  "ขออีกครั้งได้ไหม เปลี่ยนใจเถอะนะ 💞",
+  "ปุ่ม NO เริ่มน้อยใจแล้วนะ…",
+  "ยังไม่ใจอ่อนอีกเหรอเนี่ย 🥹",
+  "จักรวาลเชียร์ให้กด YES อยู่นะ ✨",
+  "ครั้งนี้ขอ YES ได้ไหม สัญญาว่าจะยิ้มให้เลย!"
+ ];
+ let noCount=0;
+ let yesScale=1;
+ let locked=false;
+
  noBtn.onclick=()=>{
-  yesSize=Math.min(yesSize+.35,2.4);yesBtn.style.transform=`scale(${yesSize})`;
-  yesBtn.style.boxShadow="0 12px 30px #f16ba866";
-  if(yesSize>=2.4){yesBtn.style.position="relative";yesBtn.style.zIndex="3"}
+  if(locked)return;
+  const message=messages[Math.min(noCount,messages.length-1)];
+  noCount++;
+
+  // แสดงข้อความถามซ้ำแบบเต็มหน้าจอ
+  const overlay=document.createElement("div");
+  overlay.className="no-overlay";
+  overlay.innerHTML=`
+   <div class="no-dialog">
+    <div class="no-dialog-deco">🥺 💗 🥺</div>
+    <div class="no-message">${message}</div>
+    <div class="no-submessage">แน่ใจแล้วเหรอ ลองเลือกอีกทีนะ ♡</div>
+    <button class="btn btn-primary no-ok">ขอคิดอีกที 💕</button>
+   </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>overlay.classList.add("show"));
+  overlay.querySelector(".no-ok").onclick=()=>{
+   overlay.classList.remove("show");
+   setTimeout(()=>overlay.remove(),250);
+  };
+
+  // ขยาย YES ทุกครั้งที่กด NO จนเต็มหน้าจอ
+  yesScale=Math.min(yesScale+0.42,5.5);
+  yesBtn.style.transform=`scale(${yesScale})`;
+  yesBtn.style.zIndex="20";
+  yesBtn.style.position="relative";
+
+  if(yesScale>=5.5 || noCount>=messages.length){
+   locked=true;
+   noBtn.disabled=true;
+   noBtn.style.display="none";
+   const hint=document.createElement("p");
+   hint.className="last-hint";
+   hint.textContent="ตอนนี้เหลือคำตอบเดียวแล้วนะ 💖";
+   content.appendChild(hint);
+
+   // ให้ YES ขยายเต็มจอและเป็นปุ่มเดียวที่กดได้
+   setTimeout(()=>{
+    yesBtn.classList.add("yes-fullscreen");
+    yesBtn.style.transform="none";
+    yesBtn.innerHTML="YES 💗";
+    yesBtn.setAttribute("aria-label","ตอบตกลง");
+    document.body.classList.add("yes-only-mode");
+   },300);
+  }
  };
+
  yesBtn.onclick=()=>{
-  content.innerHTML='<div class="final-message">หวายยย โดนหลอกแล้ว 😜<br><br>ใครจะเป็นแฟนกับหมา 🐶💗</div><div style="font-size:35px">૮ ˶ᵔ ᵕ ᵔ˶ ა</div>';
+  if(document.body.classList.contains("yes-only-mode")){
+   document.body.classList.remove("yes-only-mode");
+  }
+  content.innerHTML=`
+   <div class="final-message">หวายยย โดนหลอกแล้ว 😜<br><br>ใครจะเป็นแฟนกับหมา 🐶💗</div>
+   <div style="font-size:35px">૮ ˶ᵔ ᵕ ᵔ˶ ა</div>`;
   launchHearts(45);
  };
 }
